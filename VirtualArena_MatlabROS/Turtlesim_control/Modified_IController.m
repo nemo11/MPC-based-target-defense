@@ -48,7 +48,7 @@ classdef Modified_IController < Controller
         end
                 
         function u = computeInput(obj,varargin)
-            k = 2; 
+            k = 2.5; 
             x = obj.law(varargin{:});
             if( x > 3.14 )
                 x = x - 2*3.14;
@@ -57,6 +57,7 @@ classdef Modified_IController < Controller
                 x = x + 2*3.14;
             end
             u = k*x;
+            
         end
                
     end
