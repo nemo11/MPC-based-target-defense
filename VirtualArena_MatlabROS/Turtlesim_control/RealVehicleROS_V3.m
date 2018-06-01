@@ -48,10 +48,10 @@ classdef RealVehicleROS_V3 < CtSystem
             %% Subscriber read position of the vehicle the vehicle;
 
             locationData = obj.location.LatestMessage ;
-            y = [locationData.X;
-                 locationData.Y;
-            	 locationData.Theta];
-        
+%             y = [locationData.X;
+%                  locationData.Y;
+%             	 locationData.Theta];
+%         
        end
         
     
