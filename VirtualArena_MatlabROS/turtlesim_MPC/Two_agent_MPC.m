@@ -1,11 +1,11 @@
 
 clc; close all; clear all;
 
-mysub1 = rossubscriber('/turtle1/pose');
-mypub1 = rospublisher('/turtle1/cmd_vel');
+mysub2 = rossubscriber('/turtle1/pose');
+mypub2 = rospublisher('/turtle1/cmd_vel');
 
-mysub2 = rossubscriber('/turtle2/pose');
-mypub2 = rospublisher('/turtle2/cmd_vel');
+mysub1 = rossubscriber('/turtle2/pose');
+mypub1 = rospublisher('/turtle2/cmd_vel');
 
 D1 = receive(mysub1 , 10);
 D2 = receive(mysub2 , 10);
@@ -36,7 +36,7 @@ realSystem.initialCondition = {double([D2.X;
 mpcOp = ICtMpcOp( ...
     'System'               , realSystem,...
     'HorizonLength'        , 2*dt,...
-    'StageCost'            , @(t,x,u,varargin) sqrt((x(1) - x(4))^2 + (x(2) - x(5))^2));
+    'StageCost'            , @(t,x,u,varargin) -x(6));
 
 dtMpcOp      = DiscretizedMpcOp(mpcOp,dt);
 
@@ -44,7 +44,7 @@ dtRealSystem = DiscretizedSystem(realSystem,dt);
 
 dtRealSystem.controller = MpcController(...
     'MpcOp'       , dtMpcOp ,...
-    'MpcOpSolver' , FminconMpcOpSolver('MpcOp', dtMpcOp,'UseSymbolicEvaluation',0) ...
+    'MpcOpSolver' , FminconMpcOpSolver('MpcOp', dtMpcOp,'UseSymbolicEvaluation',1) ...
     );
 
 va = VirtualArena(dtRealSystem,...
