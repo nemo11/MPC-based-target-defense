@@ -5,6 +5,7 @@ classdef RealVehicleROS_V4 < CtSystem
         velCmd1
         location2
         velCmd2
+        flag = 0
     end
     
     methods
@@ -31,28 +32,31 @@ classdef RealVehicleROS_V4 < CtSystem
             o2 = [turtle2Data.X;turtle2Data.Y];
             
             d = sqrt((o1(1)-o2(1))*(o1(1)-o2(1)) + (o1(2)-o2(2))*(o1(2)-o2(2)));
-            
-            if (d >= 0.2)
-               
-            velMsg1.Linear.X = 0.2;
-            velMsg2.Linear.X = 0.5;
-            
-            
-            velMsg1.Angular.Z = 0;
-            disp (u(1));
-            velMsg2.Angular.Z = u(1);
-            
-            else
-            velMsg1.Linear.X = 0;
-            velMsg2.Linear.X = 0;
-            
-            velMsg1.Angular.Z = 0;
-            velMsg2.Angular.Z = 0;
-                
-            end    
+            if obj.flag > 2
+                %obj.flag = 0;
+                if (d >= 0.2)
 
-            send(obj.velCmd2,velMsg2);
-            send(obj.velCmd1,velMsg1);
+                velMsg1.Linear.X = 0.2;
+                velMsg2.Linear.X = 0.5;
+
+
+                velMsg1.Angular.Z = 0;
+                disp (u(1));
+                velMsg2.Angular.Z = double(subs(u(1)));
+
+                else
+                velMsg1.Linear.X = 0;
+                velMsg2.Linear.X = 0;
+
+                velMsg1.Angular.Z = 0;
+                velMsg2.Angular.Z = 0;
+
+                end    
+
+                send(obj.velCmd2,velMsg2);
+                send(obj.velCmd1,velMsg1);
+            
+            end   
             disp('----------x--------')
             %disp(x);
             
@@ -89,6 +93,8 @@ classdef RealVehicleROS_V4 < CtSystem
                  sqrt((D1.X - D2.X)^2 + (D1.Y - D2.Y)^2);
                  (atan2((D1.Y - D2.Y),(D1.X - D2.X)))]);
              
+            disp('--y-----'); 
+            obj.flag = obj.flag + 1;
         
        end
             
