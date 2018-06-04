@@ -36,19 +36,20 @@ classdef Modified_IController < Controller
     properties
         
         law = [];
+        kp
         
     end
         
     
     methods
                 
-        function obj = Modified_IController(law)            
+        function obj = Modified_IController(law , kp)            
             obj = obj@Controller();
             obj.law = law;            
+            obj.kp = kp;
         end
                 
-        function u = computeInput(obj,varargin)
-            k = 2.5; 
+        function u = computeInput(obj,varargin) 
             x = obj.law(varargin{:});
             if( x > 3.14 )
                 x = x - 2*3.14;
@@ -56,7 +57,7 @@ classdef Modified_IController < Controller
             if( x < -3.14 )
                 x = x + 2*3.14;
             end
-            u = k*x;
+            u = obj.kp*x;
             
         end
                
