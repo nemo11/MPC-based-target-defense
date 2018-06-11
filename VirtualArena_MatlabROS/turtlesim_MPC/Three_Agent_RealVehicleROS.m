@@ -72,7 +72,8 @@ classdef Three_Agent_RealVehicleROS < CtSystem
                     obj.vt*cos(target_position.Theta-x(9))-obj.vm*cos(x(10)-x(8));  %Velocity along Attacker-Target LOS
                     (obj.vt*sin(target_position.Theta-x(9))-obj.vm*sin(x(10)-x(9)))/x(8);   %Angular velocity of above equation
 %                     ((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2)*(obj.N*((obj.vt*sin(target_position.Theta-x(9))-obj.vm*sin(x(10)-x(9)))/x(8)))+(1-((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2))*(((-obj.K*(x(10)-x(9)))/obj.vm))];  %Angular Velocity of Target
-                    obj.N*((obj.vt*sin(target_position.Theta-x(9))-obj.vm*sin(x(10)-x(9)))/x(8))];
+%                    obj.N*((obj.vt*sin(target_position.Theta-x(9))-obj.vm*sin(x(10)-x(9)))/x(8))];
+                    (((-obj.K*(x(10)-x(9)))/obj.vm))];
                     
             if (obj.count > 2)
                 if (attacker_target_distance >= 0.2 && defender_attacker_distance >= 0.2)   

@@ -38,11 +38,11 @@ sys = Three_Agent_RealVehicleROS(N, ...
                                    );
 
 if(defender_position.Theta > 3.14)
-    defender_position.Theta = defender_position.Theta - 2^3.14;
+    defender_position.Theta = defender_position.Theta - 2*3.14;
 end
 
 if(defender_position.Theta < -3.14)
-    defender_position.Theta = defender_position.Theta + 2^3.14;
+    defender_position.Theta = defender_position.Theta + 2*3.14;
 end
                                
 sys.initialCondition = {double([attacker_position.X;
