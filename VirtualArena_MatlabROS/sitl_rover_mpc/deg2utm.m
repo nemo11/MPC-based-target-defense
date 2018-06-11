@@ -1,4 +1,4 @@
-function  [x,y,utmzone] = deg2utm(Lat,Lon)
+function  [x,y] = deg2utm(Lat,Lon)
 % -------------------------------------------------------------------------
 % [x,y,utmzone] = deg2utm(Lat,Lon)
 %
@@ -47,7 +47,7 @@ function  [x,y,utmzone] = deg2utm(Lat,Lon)
 
 % Argument checking
 %
-error(nargchk(2, 2, nargin));  %2 arguments required
+narginchk(2, 2);  %2 arguments required
 n1=length(Lat);
 n2=length(Lon);
 if (n1~=n2)
@@ -59,7 +59,7 @@ end
 %
 x=zeros(n1,1);
 y=zeros(n1,1);
-utmzone(n1,:)='60 X';
+% utmzone(n1,:)='60 X';
 
 % Main Loop
 %
@@ -128,5 +128,5 @@ for i=1:n1
 
    x(i)=xx;
    y(i)=yy;
-   utmzone(i,:)=sprintf('%02d %c',Huso,Letra);
+%    utmzone(i,:)=sprintf('%02d %c',Huso,Letra);
 end
