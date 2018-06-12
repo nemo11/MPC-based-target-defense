@@ -5,7 +5,7 @@ attacker_velocity_publisher = rospublisher('/turtle1/cmd_vel');
 
 attacker_pose_data = receive(attacker_data_subscriber , 10);
 
-dt = 1;
+dt = 0.1;
 vm = 0.8;
 
 XT = input('target X :');
