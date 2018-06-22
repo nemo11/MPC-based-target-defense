@@ -5,8 +5,8 @@ attacker_velocity_publisher = rospublisher('/turtle1/cmd_vel');
 
 attacker_pose_data = receive(attacker_data_subscriber , 10);
 
-dt = 0.1;
-vm = 0.8;
+dt = 1;
+vm = 0.5;
 
 XT = input('target X :');
 YT = input('target Y :');
@@ -40,6 +40,7 @@ mpcOp = ICtMpcOp( ...
                 'System'               , realSystem,...
                 'HorizonLength'        , 2*dt,...
                 'StageCost'            , @(t,x,u,varargin) x(6));
+            
 
 dtMpcOp      = DiscretizedMpcOp(mpcOp,dt);
 
@@ -56,4 +57,4 @@ va = VirtualArena(dtRealSystem,...
                   'DiscretizationStep', dt ,...
                   'RealTime',1/dt); 
                               
-log = va.run();
+va.run();

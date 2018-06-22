@@ -1,4 +1,4 @@
-classdef One_Agent_RealVehicleROS   <   CtSystem
+classdef One_Agent_RealVehicleROS   <   DtSystem
 
     properties
          
@@ -18,7 +18,7 @@ classdef One_Agent_RealVehicleROS   <   CtSystem
                                                 vm,...
                                                 target)
             
-            obj = obj@CtSystem('nx',7,'nu',1,'ny',7);            
+            obj = obj@DtSystem('nx',7,'nu',1,'ny',7);            
             obj.target = target;
             obj.attacker_data_subscriber = attacker_data_subscriber;            
             obj.attacker_velocity_publisher = attacker_velocity_publisher;
@@ -45,7 +45,7 @@ classdef One_Agent_RealVehicleROS   <   CtSystem
                 send(obj.attacker_velocity_publisher,attacker_velocity_Msg);
             end   
             disp('--------publishing--------')
-            
+            tic
             %state equation ...... e.g xDot = Ax + Bu (for linear systems). 
             xDot = [obj.vm*cos(x(3));
                     obj.vm*sin(x(3));
@@ -54,12 +54,16 @@ classdef One_Agent_RealVehicleROS   <   CtSystem
                     0;
                     -obj.vm*cos(x(3)-x(7));
                     -obj.vm*sin(x(3)-x(7))/x(6)];
+            
+            time1 = toc;
+            disp('f fuction takes time');
+            disp(time1);
                 
-            disp(obj.target);    
         end
         
         function y = h(obj,t,x,varargin)
         
+            tic
             % Subscriber read position of the vehicle the vehicle;
             attacker_pose_data = receive(obj.attacker_data_subscriber,10);           
             theta = attacker_pose_data.Theta;
@@ -81,8 +85,13 @@ classdef One_Agent_RealVehicleROS   <   CtSystem
                  sqrt((obj.target(1) - attacker_pose_data.X)^2 + (obj.target(1) - attacker_pose_data.Y)^2);
                  (atan2((obj.target(2) - attacker_pose_data.Y),(obj.target(1) - attacker_pose_data.X)))]);
              
+            time2 = toc;
+            disp('y fuction time')
+            disp(time2);
             disp('---taking output feedback---'); 
             obj.flag = obj.flag + 1;        
-        end            
+        end  
+        
+        
     end    
 end

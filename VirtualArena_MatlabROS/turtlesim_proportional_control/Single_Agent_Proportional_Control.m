@@ -6,7 +6,7 @@ clc; close all;
 agent_pose_subscriber = rossubscriber('/turtle1/pose');
 agent_velocity_publisher = rospublisher('/turtle1/cmd_vel');
 
-dt = 0.1;
+dt = 1;
 kp = 2;
 velocity = 1;
 agent_pose_data = receive(agent_pose_subscriber , 10);
@@ -25,8 +25,6 @@ sys.controller = Modified_IController(@(t,x) (atan2((target(2) - x(2)),(target(1
 va = VirtualArena(sys,...
     'StoppingCriteria'  , @(t,x,sysList)sqrt((sys.x(1)-a)*(sys.x(1)-a) + (sys.x(2)-b)*(sys.x(2)-b))<=0.1,...
     'DiscretizationStep', dt ,...
-    'RealTime',1 , ...
-    'PlottingStep'      , 1 ,...
-    'StepPlotFunction'  , @ex01StepPlotFunction);
+    'RealTime',1 );
   
 log = va.run();
