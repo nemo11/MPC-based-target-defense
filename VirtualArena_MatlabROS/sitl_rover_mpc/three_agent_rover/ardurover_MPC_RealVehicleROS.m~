@@ -129,13 +129,23 @@ classdef ardurover_MPC_RealVehicleROS < CtSystem
         end
         
         function pub(obj,t,x,u,varargin)
+            
+            attacker_LatLon = receive(obj.attacker_LatLon_subscriber,10);
+%             attacker_angle = receive(obj.attacker_angle_subscriber,10);
+            target_LatLon = receive(obj.target_LatLon_subscriber,10);
+            defender_LatLon = receive(obj.defender_LatLon_subscriber,10);
+%             defender_angle = receive(obj.defender_angle_subscriber,10);
 
-            attacker_utmX = x(1);
-            attacker_utmY = x(2);
-            target_utmX = x(6);
-            target_utmY = x(7);
-            defender_utmX = x(3);
-            defender_utmY = x(4);
+            %% bounding theta of rover between -pi to pi
+
+             
+            %% Convert to UTM
+
+            [attacker_utmX, attacker_utmY] = deg2utm(attacker_LatLon.Latitude, attacker_LatLon.Longitude);
+            [target_utmX, target_utmY] = deg2utm(target_LatLon.Latitude, target_LatLon.Longitude);
+            [defender_utmX, defender_utmY] = deg2utm(defender_LatLon.Latitude, defender_LatLon.Longitude);
+
+            %% ......                               
 
             attacker_target_distance = sqrt((attacker_utmX - target_utmX)^2 + (attacker_utmY - target_utmY)^2);
             defender_attacker_distance = sqrt((defender_utmX - attacker_utmX)^2 + (defender_utmY - attacker_utmY)^2);
@@ -154,13 +164,13 @@ classdef ardurover_MPC_RealVehicleROS < CtSystem
                     obj.target_vel_Msg.Linear.X = 0;
                     obj.target_vel_Msg.Angular.Z = 0;
                     obj.defender_vel_Msg.Linear.X = 0;
-                    obj.defender_vel_Msg.Angular.Z = 0;
+                    objdefender_vel_Msg.Angular.Z = 0;
                 end
             end
             
-            send(obj.attacker_velocity_publisher, obj.attacker_vel_Msg);
-            send(obj.target_velocity_publisher, obj.target_vel_Msg);
-            send(obj.defender_velocity_publisher, obj.defender_vel_Msg);
+            send(obj.attacker_velocity_publisher, objattacker_vel_Msg);
+            send(obj.target_velocity_publisher, objtarget_vel_Msg);
+            send(obj.defender_velocity_publisher, objdefender_vel_Msg);
         
         end
     
