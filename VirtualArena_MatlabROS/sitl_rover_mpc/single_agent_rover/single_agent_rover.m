@@ -6,9 +6,9 @@ clc; close all; clear all;
 
 % publisher,subscriber and other required initializations....
 
-LatLon_subscriber = rossubscriber('/mavros/global_position/global');
-angle_subscriber = rossubscriber('/mavros/global_position/compass_hdg');
-velocity_publisher = rospublisher('/mavros/setpoint_velocity/cmd_vel_unstamped');
+LatLon_subscriber = rossubscriber('attacker/mavros/global_position/global');
+angle_subscriber = rossubscriber('attacker/mavros/global_position/compass_hdg');
+velocity_publisher = rospublisher('attacker/mavros/setpoint_velocity/cmd_vel_unstamped');
 
 LatLon_Msg = receive(LatLon_subscriber, 10);
 angle_Msg = receive(angle_subscriber, 10);

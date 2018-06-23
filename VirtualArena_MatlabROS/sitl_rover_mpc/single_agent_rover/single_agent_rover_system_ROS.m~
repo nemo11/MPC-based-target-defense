@@ -9,7 +9,6 @@ classdef single_agent_rover_system_ROS < CtSystem
         velocity_publisher
         target
         velocity_magnitude
-        vel_Msg
     end
     
     methods
@@ -27,7 +26,6 @@ classdef single_agent_rover_system_ROS < CtSystem
             obj.velocity_publisher = velocity_publisher;
             obj.target = target;
             obj.velocity_magnitude = velocity_magnitude;
-            obj.vel_Msg = rosmessage(obj.velocity_publisher);
         end
         
         function xDot = f(obj,t,x,u,varargin)
@@ -70,32 +68,27 @@ classdef single_agent_rover_system_ROS < CtSystem
             obj.flag = 1;
         end
         function pub(obj,t,x,u,varargin)
-            tic
-            %rover_LatLon = receive(obj.LatLon_subscriber,10);
+            vel_Msg = rosmessage(obj.velocity_publisher);
+            rover_LatLon = receive(obj.LatLon_subscriber,10);
             
-            utmX1 = x(1);
-            utmY1 = x(2);
+            [utmX, utmY] = deg2utm(rover_LatLon.Latitude, rover_LatLon.Longitude);
             
-            distance = sqrt((utmX1-obj.target(1))^2 + (utmY1-obj.target(2))^2);
+            distance = sqrt((utmX-obj.target(1))^2 + (utmY-obj.target(2))^2);
             
             if obj.count > 2             %to avoid initial random values.
                 disp('--------publishing--------');
 %                 if (distance >= 2 && obj.flag == 1)
                 if (distance >= 2)
-                    obj.vel_Msg.Linear.X = obj.velocity_magnitude;
-                    obj.vel_Msg.Angular.Z = u(1);
+                    vel_Msg.Linear.X = obj.velocity_magnitude;
+                    vel_Msg.Angular.Z = u(1);
+                    send(obj.velocity_publisher,vel_Msg);
                     obj.flag = 0;
                 else
-                    obj.vel_Msg.Linear.X = 0;
-                    obj.vel_Msg.Angular.Z = 0;
-                    
-                end
-                send(obj.velocity_publisher,obj.vel_Msg);
-            end
-            
-            time3 = toc;
-            disp('--publishing time--');
-            disp(time3);
+                    vel_Msg.Linear.X = 0;
+                    vel_Msg.Angular.Z = 0;
+                    send(obj.velocity_publisher,vel_Msg);
+                end    
+            end   
 
         end
     end    

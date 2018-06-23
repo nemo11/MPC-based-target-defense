@@ -8,7 +8,8 @@ classdef One_Agent_RealVehicleROS   <   DtSystem
         target
         attacker_data_subscriber
         attacker_velocity_publisher
-
+        attacker_velocity_Msg
+        
     end
     
     methods
@@ -23,28 +24,12 @@ classdef One_Agent_RealVehicleROS   <   DtSystem
             obj.attacker_data_subscriber = attacker_data_subscriber;            
             obj.attacker_velocity_publisher = attacker_velocity_publisher;
             obj.vm = vm;
+            obj.attacker_velocity_Msg = rosmessage(obj.attacker_velocity_publisher);
         end
         
         function xDot = f(obj,t,x,u,varargin)
             
             % Publisher send u to the vehicle;
-            attacker_velocity_Msg = rosmessage(obj.attacker_velocity_publisher);
-            attacker_Pose_data = receive(obj.attacker_data_subscriber,10);
-            
-            o2 = [attacker_Pose_data.X;attacker_Pose_data.Y];
-            d = sqrt((obj.target(1)-o2(1))^2+ (obj.target(2)-o2(2))^2);    %distance between target and attacker.
-            
-            if obj.flag > 2             %to avoid initial random values.
-                if (d >= 0.2)                    
-                    attacker_velocity_Msg.Linear.X = obj.vm;
-                    attacker_velocity_Msg.Angular.Z = double(subs(u(1)));
-                else
-                    attacker_velocity_Msg.Linear.X = 0;
-                    attacker_velocity_Msg.Angular.Z = 0;
-                end    
-                send(obj.attacker_velocity_publisher,attacker_velocity_Msg);
-            end   
-            disp('--------publishing--------')
             tic
             %state equation ...... e.g xDot = Ax + Bu (for linear systems). 
             xDot = [obj.vm*cos(x(3));
@@ -92,6 +77,29 @@ classdef One_Agent_RealVehicleROS   <   DtSystem
             obj.flag = obj.flag + 1;        
         end  
         
+        function pub(obj,t,x,u,varargin)
+            % Publisher send u to the vehicle;
+            %attacker_Pose_data = receive(obj.attacker_data_subscriber,10);
+            tic
+            %o2 = [attacker_Pose_data.X;attacker_Pose_data.Y];
+            o2 = [x(1) , x(2)];
+            d = sqrt((obj.target(1)-o2(1))^2+ (obj.target(2)-o2(2))^2);    %distance between target and attacker.
+            
+            if obj.flag > 2             %to avoid initial random values.
+                if (d >= 0.2)                    
+                    obj.attacker_velocity_Msg.Linear.X = obj.vm;
+                    obj.attacker_velocity_Msg.Angular.Z = double(subs(u(1)));
+                else
+                    obj.attacker_velocity_Msg.Linear.X = 0;
+                    obj.attacker_velocity_Msg.Angular.Z = 0;
+                end    
+                send(obj.attacker_velocity_publisher,obj.attacker_velocity_Msg);
+            end   
+            
+            time3 = toc;
+            disp('--------publishing time--------');
+            disp(time3);
+        end
         
     end    
 end
