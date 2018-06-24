@@ -20,8 +20,8 @@ attacker_LatLon = receive(attacker_LatLon_subscriber , 10);
 attacker_angle = receive(attacker_angle_subscriber , 10);
 
 dt = 1;
-vm = 0.5;
-vt = 0.3;
+vm = 0.1;
+vt = 0.5;
 
 %system initialization.
 realSystem = two_agent_rover_system_ROS(target_LatLon_subscriber,...
