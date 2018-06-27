@@ -16,9 +16,9 @@ defender_velocity_publisher = rospublisher('/defender/mavros/setpoint_velocity/c
 dt = 0.95;
 vm = 0.9;
 vt = 0.3;
-vd = 0.6;
+vd = 0.4;
 K = 10;
-N = 3;
+N = 20;
 switchGuidanceLaw = 10;
 
 attacker_LatLon = receive(attacker_LatLon_subscriber,10);
