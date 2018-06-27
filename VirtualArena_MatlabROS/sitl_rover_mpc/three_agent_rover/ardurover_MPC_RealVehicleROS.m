@@ -73,7 +73,7 @@ classdef ardurover_MPC_RealVehicleROS < CtSystem
         function xDot = f(obj,t,x,u,varargin)
 
             %% bounding theta of rover between -pi to pi
-            %asdf = tic;
+  
             target_ang = 90 - obj.target_angle;
             
             xDot = [obj.vm*cos(x(10));  %Velocity of Attacker in x-dircetion

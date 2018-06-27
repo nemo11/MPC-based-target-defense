@@ -1,6 +1,6 @@
 %PNPP
 %moving target
-%EKF
+
 clc; close all; clear all;
 
 attacker_LatLon_subscriber = rossubscriber('/attacker/mavros/global_position/global');
