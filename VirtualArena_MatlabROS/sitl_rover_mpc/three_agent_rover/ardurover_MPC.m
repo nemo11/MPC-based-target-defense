@@ -29,7 +29,7 @@ defender_LatLon = receive(defender_LatLon_subscriber,10);
 defender_angle = receive(defender_angle_subscriber,10);
 
 %% Real Vehicle Model
-sys = ardurover_MPC_RealVehicleROS1(N, ...
+sys = ardurover_MPC_RealVehicleROS(N, ...
                                    K, ...
                                    switchGuidanceLaw, ...
                                    vm, ...
@@ -50,7 +50,7 @@ sys = ardurover_MPC_RealVehicleROS1(N, ...
 
  attacker_angle.Data = 90 - attacker_angle.Data;
  defender_angle.Data = 90 - defender_angle.Data;
- target_angle.Data = 90 - target_angle.Data;
+ %target_angle.Data = 90 - target_angle.Data;
 
 %% Convert to UTM
 
@@ -66,7 +66,6 @@ sys.initialCondition = {double([attacker_utmX;
                                 deg2rad(defender_angle.Data);
                                 target_utmX;
                                 target_utmY;
-                                deg2rad(target_angle.Data);
                                 sqrt((target_utmX - attacker_utmX)^2 + (target_utmY - attacker_utmY)^2);
                                 atan2(target_utmY - attacker_utmY, target_utmX - attacker_utmX);
                                 deg2rad(attacker_angle.Data)])};
