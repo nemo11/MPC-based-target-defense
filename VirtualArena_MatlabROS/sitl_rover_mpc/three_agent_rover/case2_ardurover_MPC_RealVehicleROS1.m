@@ -176,7 +176,8 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
              obj.count = obj.count + 1;
         end
         
-        function pub(obj,t,x,u,varargin)
+        function flag = pub(obj,t,x,u,varargin)
+            flag = 0;
             time3 = tic;
             attacker_utmX = x(1);
             attacker_utmY = x(2);
@@ -206,14 +207,15 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.target_vel_Msg.Angular.Z = 0;
                     obj.defender_vel_Msg.Linear.X = 0;
                     obj.defender_vel_Msg.Angular.Z = 0;
-                    while (1)
+                   % while (1)
                         if (attacker_target_distance <= 1)
                            disp('attacker reached target');
                         end
                         if (defender_attacker_distance <= 1)
                            disp('defender reached attacker');
                         end
-                    end
+                   % end
+                   flag = 1;
                 end
             end
             
@@ -222,6 +224,8 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
             send(obj.defender_velocity_publisher, obj.defender_vel_Msg);
             
             time4 = toc(time3);
+            
+            
 %             disp('--- pub time ---')
 %             disp(time4);
         
