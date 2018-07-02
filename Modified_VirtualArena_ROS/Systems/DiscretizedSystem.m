@@ -77,8 +77,8 @@ classdef DiscretizedSystem < DtSystem
             
         end
 
-	function pub(obj,varargin)
-	    obj.OriginalCtSystem.pub(varargin{:});
+	function flag = pub(obj,varargin)
+	    flag = obj.OriginalCtSystem.pub(varargin{:});
 	end
                 
     end
