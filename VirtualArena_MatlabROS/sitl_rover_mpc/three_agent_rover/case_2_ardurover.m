@@ -16,8 +16,8 @@ defender_velocity_publisher = rospublisher('/defender/mavros/setpoint_velocity/c
 dt = 0.1;
 vm = 0.5;
 vt = 0.2;
-vd = 0.6;
-e = 0.1;
+vd = 0.7;
+e = 7;
 K = 10;
 N = 15;
 switchGuidanceLaw = 10;
@@ -76,7 +76,9 @@ mpcOp = ICtMpcOp( ...
     'System'               , sys,...
     'HorizonLength'        , 2*dt,...
     'StageConstraints'     , {BoxSet( [-1;0;-3.14],12:14,[1;0.4;3.14],12:14,14)},...
-    'StageCost'            , @(t,x,u,varargin) (u(2)^2) - ((e - sqrt((x(6)-x(1))^2+(x(7)-x(2))^2))^2)+((x(3)-x(1))^2+(x(4)-x(2))^2));
+    'StageCost'            , @(t,x,u,varargin) ((1-not(not(floor(e/(sqrt((x(6)-x(1))^2+(x(7)-x(2))^2))))))*u(2))...
+                            -(not(not(floor(e/(sqrt((x(6)-x(1))^2+(x(7)-x(2))^2)))))*((x(6)-x(1))^2+(x(7)-x(2))^2))...
+                            +((x(3)-x(1))^2+(x(4)-x(2))^2));
 
 dtMpcOp      = DiscretizedMpcOp(mpcOp,dt);
 
