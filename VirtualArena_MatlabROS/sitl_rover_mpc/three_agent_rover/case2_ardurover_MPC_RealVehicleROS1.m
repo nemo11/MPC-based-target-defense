@@ -74,8 +74,8 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
 
             %% bounding theta of rover between -pi to pi
   
-            target_ang = 90 - obj.target_angle;
-            
+            %target_ang = 90 - obj.target_angle;
+ 
             xDot = [obj.vm*cos(x(10));  %Velocity of Attacker in x-dircetion
                     obj.vm*sin(x(10));  %Velocity of Attacker in y-dircetion
                     obj.vd*cos(x(5));   %Velocity of Defender in x-dircetion
@@ -218,7 +218,7 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
             end
             
             send(obj.attacker_velocity_publisher, obj.attacker_vel_Msg);
-           % send(obj.target_velocity_publisher, obj.target_vel_Msg);
+            send(obj.target_velocity_publisher, obj.target_vel_Msg);
            % send(obj.defender_velocity_publisher, obj.defender_vel_Msg);
             
             time4 = toc(time3);
