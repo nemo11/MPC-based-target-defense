@@ -88,7 +88,7 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     (obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10)))/x(9);   %Angular velocity of above equation
 %                     ((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2)*(obj.N*((obj.vt*sin(target_angle.Data-x(9))-obj.vm*sin(x(10)-x(9)))/x(8)))+(1-((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2))*(((-obj.K*(x(10)-x(9)))/obj.vm))];  %Angular Velocity of Target
                   % x(10)];
-                    obj.N*((obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10)))/x(9))];
+                    obj.N*((obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10))))];
                     
             obj.attacker_angular_velocity = xDot(11);
             
@@ -175,8 +175,9 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     
              obj.count = obj.count + 1;
         end
-        
-        function pub(obj,t,x,u,varargin)
+         
+        function flag = pub(obj,t,x,u,varargin)
+            flag =0;
             time3 = tic;
             attacker_utmX = x(1);
             attacker_utmY = x(2);
@@ -190,7 +191,7 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
             
             
             if (obj.count > 3)
-                if (attacker_target_distance >= 0.7 && defender_attacker_distance >= 0.7)   
+                if (attacker_target_distance >= 0.1 && defender_attacker_distance >= 0.15)   
                     obj.attacker_vel_Msg.Linear.X = obj.vm;
                     disp('attacker angular velocity');
                     disp(obj.attacker_angular_velocity);
@@ -207,19 +208,20 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.target_vel_Msg.Angular.Z = 0;
                     obj.defender_vel_Msg.Linear.X = 0;
                     obj.defender_vel_Msg.Angular.Z = 0;
-                    while (1)
+                 %   while (1)
                         if (attacker_target_distance <= 1)
                            disp('attacker reached target');
                         end
                         if (defender_attacker_distance <= 1)
                            disp('defender reached attacker');
                         end
-                    end
+                  %  end
+                  flag =1;
                 end
             end
             
             send(obj.attacker_velocity_publisher, obj.attacker_vel_Msg);
-           % send(obj.target_velocity_publisher, obj.target_vel_Msg);
+            send(obj.target_velocity_publisher, obj.target_vel_Msg);
            % send(obj.defender_velocity_publisher, obj.defender_vel_Msg);
             
             time4 = toc(time3);

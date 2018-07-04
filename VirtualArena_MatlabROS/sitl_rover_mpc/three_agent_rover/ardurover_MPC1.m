@@ -18,7 +18,7 @@ vm = 0.4;
 vt = 0.2;
 vd = 0.5;
 K = 10;
-N = 15;
+N = 10;
 switchGuidanceLaw = 10;
 
 attacker_LatLon = receive(attacker_LatLon_subscriber,10);
@@ -74,6 +74,7 @@ sys.initialCondition = {double([attacker_utmX;
 mpcOp = ICtMpcOp( ...
     'System'               , sys,...
     'HorizonLength'        , 2*dt,...
+    'StageConstraints'     , {BoxSet( [-0.8; 0],12:13,[0.8 ; 0.4],12:13,13)},...
     'StageCost'            , @(t,x,u,varargin) -((x(6)-x(1))^2+(x(7)-x(2))^2)+((x(3)-x(1))^2+(x(4)-x(2))^2));
 
 dtMpcOp      = DiscretizedMpcOp(mpcOp,dt);
