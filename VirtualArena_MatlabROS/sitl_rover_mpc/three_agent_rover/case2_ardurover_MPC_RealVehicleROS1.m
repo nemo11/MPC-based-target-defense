@@ -82,11 +82,9 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
                     u(2)*cos(x(8));  %Velocity of Target in x-dircetion
                     u(2)*sin(x(8));  %Velocity of Target in y-dircetion
                     u(3);
-                    obj.vt*cos(x(8)-x(10))-obj.vm*cos(x(11)-x(10));  %Velocity along Attacker-Target LOS
-                    (obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10)))/x(9);   %Angular velocity of above equation
-%                     ((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2)*(obj.N*((obj.vt*sin(target_angle.Data-x(9))-obj.vm*sin(x(10)-x(9)))/x(8)))+(1-((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2))*(((-obj.K*(x(10)-x(9)))/obj.vm))];  %Angular Velocity of Target
-                  % x(10)];
-                    obj.N*((obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10))))];
+                    u(2)*cos(x(8)-x(10))-obj.vm*cos(x(11)-x(10));  %Velocity along Attacker-Target LOS
+                    (u(2)*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10)))/x(9);   %Angular velocity of above equation
+                    obj.N*((u(2)*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10))))];
                     
             obj.attacker_angular_velocity = xDot(11);
             
@@ -183,19 +181,22 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
             target_utmY = x(7);
             defender_utmX = x(3);
             defender_utmY = x(4);
-
+            
+            dist = (sqrt((x(6)-x(1))^2+(x(7)-x(2))^2));
+            disp('distance');
+            disp(dist);
             attacker_target_distance = sqrt((attacker_utmX - target_utmX)^2 + (attacker_utmY - target_utmY)^2);
             defender_attacker_distance = sqrt((defender_utmX - attacker_utmX)^2 + (defender_utmY - attacker_utmY)^2);
             
             
             if (obj.count > 3)
-                if (attacker_target_distance >= 0.1 && defender_attacker_distance >= 0.2)   
+                if (attacker_target_distance >= 0.3 && defender_attacker_distance >= 0.3)   
                     obj.attacker_vel_Msg.Linear.X = obj.vm;
-                    disp('attacker angular velocity');
+                    %disp('attacker angular velocity');
                     disp(obj.attacker_angular_velocity);
                     obj.attacker_vel_Msg.Angular.Z = obj.attacker_angular_velocity;
-                    disp('target linear velocity');
-                    disp(u(2));
+                    %disp('target linear velocity');
+                    %disp(u(2));
                     obj.target_vel_Msg.Linear.X = u(2);
                     obj.target_vel_Msg.Angular.Z = u(3);
                     obj.defender_vel_Msg.Linear.X = obj.vd;
@@ -208,10 +209,10 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.defender_vel_Msg.Linear.X = 0;
                     obj.defender_vel_Msg.Angular.Z = 0;
                    % while (1)
-                        if (attacker_target_distance <= 0.1)
+                        if (attacker_target_distance <= 0.3)
                            disp('attacker reached target');
                         end
-                        if (defender_attacker_distance <= 0.2)
+                        if (defender_attacker_distance <= 0.3)
                            disp('defender reached attacker');
                         end
                    % end

@@ -69,7 +69,8 @@ classdef single_agent_rover_system_ROS < CtSystem
             obj.count = obj.count + 1;
             obj.flag = 1;
         end
-        function pub(obj,t,x,u,varargin)
+        function flag = pub(obj,t,x,u,varargin)
+            flag =0;
             tic
             %rover_LatLon = receive(obj.LatLon_subscriber,10);
             
@@ -88,7 +89,7 @@ classdef single_agent_rover_system_ROS < CtSystem
                 else
                     obj.vel_Msg.Linear.X = 0;
                     obj.vel_Msg.Angular.Z = 0;
-                    
+                    flag =1;
                 end
                 send(obj.velocity_publisher,obj.vel_Msg);
             end

@@ -1,4 +1,4 @@
-classdef ardurover_MPC_RealVehicleROS1 < CtSystem
+classdef case0_ardurover_MPC_RealVehicleROS < CtSystem
 
     properties
         count = 0
@@ -8,13 +8,19 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
         vm      % Attacker Velocity Magnitude
         vt      % Target Velocity Magnitude
         vd      % Defender Velocity Magnitude
-        attacker_LatLon_subscriber
+        attacker_home_utmX
+        attacker_home_utmY
+        attacker_utm_subscriber
         attacker_angle_subscriber
         attacker_velocity_publisher
-        target_LatLon_subscriber
+        target_home_utmX
+        target_home_utmY
+        target_utm_subscriber
         target_angle_subscriber
         target_velocity_publisher
-        defender_LatLon_subscriber
+        defender_home_utmX
+        defender_home_utmY
+        defender_utm_subscriber
         defender_angle_subscriber
         defender_velocity_publisher
         target_angle
@@ -28,37 +34,46 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
     
     methods
         
-        function obj = ardurover_MPC_RealVehicleROS1(N, ...
+        function obj = case0_ardurover_MPC_RealVehicleROS(N, ...
                                           K, ...
                                           switchGuidanceLaw, ...
                                           vm, ...
                                           vt, ...
                                           vd, ...
-                                          attacker_LatLon_subscriber, ...
-                                          attacker_angle_subscriber, ...
-                                          attacker_velocity_publisher, ...
-                                          target_LatLon_subscriber, ...
-                                          target_angle_subscriber, ...
-                                          target_velocity_publisher, ...
-                                          defender_LatLon_subscriber, ...
-                                          defender_angle_subscriber, ...
-                                          defender_velocity_publisher ...
+                                          attacker_home_utm, ...
+                                           attacker_utm_subscriber, ...
+                                           attacker_angle_subscriber, ...
+                                           attacker_velocity_publisher, ...
+                                           target_home_utm, ...
+                                           target_utm_subscriber, ...
+                                           target_angle_subscriber, ...
+                                           target_velocity_publisher, ...
+                                           defender_home_utm, ...
+                                           defender_utm_subscriber, ...
+                                           defender_angle_subscriber, ...
+                                           defender_velocity_publisher ...
                                           )
                                       
-            obj = obj@CtSystem('nx',11,'nu',2,'ny',11);
+            obj = obj@CtSystem('nx',10,'nu',1,'ny',10);
             obj.N = N;
             obj.K = K;
             obj.switchGuidanceLaw = switchGuidanceLaw;
             obj.vm = vm;
             obj.vt = vt;
             obj.vd = vd;
-            obj.attacker_LatLon_subscriber = attacker_LatLon_subscriber;
+            obj.attacker_home_utmX = attacker_home_utm(1);
+            obj.attacker_home_utmY = attacker_home_utm(2);
+            obj.attacker_utm_subscriber = attacker_utm_subscriber;
             obj.attacker_angle_subscriber = attacker_angle_subscriber;
             obj.attacker_velocity_publisher = attacker_velocity_publisher;
-            obj.target_LatLon_subscriber = target_LatLon_subscriber;
+            obj.target_home_utmX = target_home_utm(1);
+            obj.target_home_utmY = target_home_utm(2);
+            obj.target_utm_subscriber = target_utm_subscriber;
             obj.target_angle_subscriber = target_angle_subscriber;
             obj.target_velocity_publisher = target_velocity_publisher;
-            obj.defender_LatLon_subscriber = defender_LatLon_subscriber;
+            obj.defender_home_utmX = defender_home_utm(1);
+            obj.defender_home_utmY = defender_home_utm(2);
+            obj.defender_utm_subscriber = defender_utm_subscriber;
             obj.defender_angle_subscriber = defender_angle_subscriber;
             obj.defender_velocity_publisher = defender_velocity_publisher;
             obj.target_angle1 = receive(obj.target_angle_subscriber,10);
@@ -81,16 +96,15 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.vd*cos(x(5));   %Velocity of Defender in x-dircetion
                     obj.vd*sin(x(5));   %Velocity of Defender in x-dircetion
                     u(1);               %Angular Velocity of Defender
-                    obj.vt*cos(x(8));  %Velocity of Target in x-dircetion
-                    obj.vt*sin(x(8));  %Velocity of Target in y-dircetion
-                    u(2);
-                    obj.vt*cos(x(8)-x(10))-obj.vm*cos(x(11)-x(10));  %Velocity along Attacker-Target LOS
-                    (obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10)))/x(9);   %Angular velocity of above equation
+                    obj.vt*cos(deg2rad(target_ang));  %Velocity of Target in x-dircetion
+                    obj.vt*sin(deg2rad(target_ang));  %Velocity of Target in y-dircetion
+                    obj.vt*cos(deg2rad(target_ang)-x(9))-obj.vm*cos(x(10)-x(9));  %Velocity along Attacker-Target LOS
+                    (obj.vt*sin(deg2rad(target_ang)-x(9))-obj.vm*sin(x(10)-x(9)))/x(8);   %Angular velocity of above equation
 %                     ((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2)*(obj.N*((obj.vt*sin(target_angle.Data-x(9))-obj.vm*sin(x(10)-x(9)))/x(8)))+(1-((((-1).^floor(ceil(t/obj.switchGuidanceLaw)))+1)/2))*(((-obj.K*(x(10)-x(9)))/obj.vm))];  %Angular Velocity of Target
                   % x(10)];
-                    obj.N*((obj.vt*sin(x(8)-x(10))-obj.vm*sin(x(11)-x(10))))];
+                    obj.N*((obj.vt*sin(deg2rad(target_ang)-x(9))-obj.vm*sin(x(10)-x(9)))/x(8))];
                     
-            obj.attacker_angular_velocity = xDot(11);
+            obj.attacker_angular_velocity = xDot(10);
             
              %asdf1= toc(asdf);
              %disp('--time aken by f--');
@@ -104,8 +118,8 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
 
             %attacker_LatLon = receive(obj.attacker_LatLon_subscriber,10);
             %attacker_angle = receive(obj.attacker_angle_subscriber,10);
-            attacker_Lat = obj.attacker_LatLon_subscriber.LatestMessage.Latitude;
-            attacker_Lon = obj.attacker_LatLon_subscriber.LatestMessage.Longitude;
+            attacker_utmX = obj.attacker_utm_subscriber.LatestMessage.Pose.Pose.Position.X + obj.attacker_home_utmX;
+            attacker_utmY = obj.attacker_utm_subscriber.LatestMessage.Pose.Pose.Position.Y + obj.attacker_home_utmY;
             attacker_angle = obj.attacker_angle_subscriber.LatestMessage.Data;
             
   %          qwerty1 = toc(qwerty);
@@ -114,8 +128,8 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
             qwerty2 = tic;
             %target_LatLon = receive(obj.target_LatLon_subscriber,10);
 %             target_angle = receive(obj.target_angle_subscriber,10);
-            target_Lat = obj.target_LatLon_subscriber.LatestMessage.Latitude;
-            target_Lon = obj.target_LatLon_subscriber.LatestMessage.Longitude;
+            target_utmX = obj.target_utm_subscriber.LatestMessage.Pose.Pose.Position.X + obj.target_home_utmX;
+            target_utmY = obj.target_utm_subscriber.LatestMessage.Pose.Pose.Position.Y + obj.target_home_utmY;
             obj.target_angle = obj.target_angle_subscriber.LatestMessage.Data;
             
             qwerty3 = toc(qwerty2);
@@ -125,8 +139,8 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
           %  defender_LatLon = receive(obj.defender_LatLon_subscriber,10);
           %  defender_angle = receive(obj.defender_angle_subscriber,10);
            
-            defender_Lat = obj.defender_LatLon_subscriber.LatestMessage.Latitude;
-            defender_Lon = obj.defender_LatLon_subscriber.LatestMessage.Longitude;
+            defender_utmX = obj.defender_utm_subscriber.LatestMessage.Pose.Pose.Position.X + obj.defender_home_utmX;
+            defender_utmY = obj.defender_utm_subscriber.LatestMessage.Pose.Pose.Position.Y + obj.defender_home_utmY;
             defender_angle = obj.defender_angle_subscriber.LatestMessage.Data;
           
           
@@ -141,11 +155,11 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
             target_ang = 90 - obj.target_angle;
 
             
-            %% Convert to UTM
-            
-            [attacker_utmX, attacker_utmY] = deg2utm(attacker_Lat, attacker_Lon);
-            [target_utmX, target_utmY] = deg2utm(target_Lat, target_Lon);
-            [defender_utmX, defender_utmY] = deg2utm(defender_Lat, defender_Lon);
+%             %% Convert to UTM
+%             
+%             [attacker_utmX, attacker_utmY] = deg2utm(attacker_Lat, attacker_Lon);
+%             [target_utmX, target_utmY] = deg2utm(target_Lat, target_Lon);
+%             [defender_utmX, defender_utmY] = deg2utm(defender_Lat, defender_Lon);
 
             %% ......                               
             %uDash = obj.N*((obj.vt*sin(deg2rad(target_ang)-x(9))-obj.vm*sin(x(10)-x(9)))/x(8));
@@ -165,7 +179,6 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                         deg2rad(defender_angle);
                         target_utmX;
                         target_utmY;
-                        deg2rad(target_ang);
                         sqrt((target_utmX - attacker_utmX)^2 + (target_utmY - attacker_utmY)^2);
                         atan2(target_utmY - attacker_utmY, target_utmX - attacker_utmX);
                         deg2rad(attacker_angle)]);
@@ -175,9 +188,9 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     
              obj.count = obj.count + 1;
         end
-         
+        
         function flag = pub(obj,t,x,u,varargin)
-            flag =0;
+            flag = 0;
             time3 = tic;
             attacker_utmX = x(1);
             attacker_utmY = x(2);
@@ -191,14 +204,13 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
             
             
             if (obj.count > 3)
-                if (attacker_target_distance >= 0.1 && defender_attacker_distance >= 0.15)   
+                if (attacker_target_distance >= 0.7 && defender_attacker_distance >= 0.7)   
                     obj.attacker_vel_Msg.Linear.X = obj.vm;
                     disp('attacker angular velocity');
                     disp(obj.attacker_angular_velocity);
                     obj.attacker_vel_Msg.Angular.Z = obj.attacker_angular_velocity;
                     obj.target_vel_Msg.Linear.X = obj.vt;
-                    disp(u(2));
-                    obj.target_vel_Msg.Angular.Z = u(2);
+                    obj.target_vel_Msg.Angular.Z = 0;
                     obj.defender_vel_Msg.Linear.X = obj.vd;
                     obj.defender_vel_Msg.Angular.Z = u(1);
                 else
@@ -208,15 +220,15 @@ classdef ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.target_vel_Msg.Angular.Z = 0;
                     obj.defender_vel_Msg.Linear.X = 0;
                     obj.defender_vel_Msg.Angular.Z = 0;
-                 %   while (1)
+                    flag = 1;
+%                     while (1)
                         if (attacker_target_distance <= 1)
                            disp('attacker reached target');
                         end
                         if (defender_attacker_distance <= 1)
                            disp('defender reached attacker');
                         end
-                  %  end
-                  flag =1;
+%                     end
                 end
             end
             
