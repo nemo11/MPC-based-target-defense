@@ -190,7 +190,7 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
             
             
             if (obj.count > 3)
-                if (attacker_target_distance >= 0.3 && defender_attacker_distance >= 0.3)   
+                if (attacker_target_distance >= 0.5 && defender_attacker_distance >= 2)   
                     obj.attacker_vel_Msg.Linear.X = obj.vm;
                     %disp('attacker angular velocity');
                     disp(obj.attacker_angular_velocity);
@@ -209,10 +209,10 @@ classdef case2_ardurover_MPC_RealVehicleROS1 < CtSystem
                     obj.defender_vel_Msg.Linear.X = 0;
                     obj.defender_vel_Msg.Angular.Z = 0;
                    % while (1)
-                        if (attacker_target_distance <= 0.3)
+                        if (attacker_target_distance <= 0.5)
                            disp('attacker reached target');
                         end
-                        if (defender_attacker_distance <= 0.3)
+                        if (defender_attacker_distance <= 2)
                            disp('defender reached attacker');
                         end
                    % end
